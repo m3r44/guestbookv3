@@ -1,0 +1,100 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{% block title %}Guestbook{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet">
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <h1>Guestbook</h1>
+
+</head>
+<body>
+<div class="container">
+
+    {% if result_add_post == true %}
+        <div class="alert alert-success" role="alert">
+            Post added!
+        </div>
+        {# <span style="color:red;text-align:center;">Your post has been added!</span> #}
+    {% elseif result_add_post == false and is_post_add == true %}
+        <div class="alert alert-warning" role="alert">
+            You did not enter in all the required information!
+        </div>
+    {% elseif result_delete_post == true %}
+        <div class="alert alert-success" role="alert">
+            Post deleted!
+        </div>
+    {% elseif result_delete_post == false and is_post_delete == true %}
+        <div class="alert alert-warning" role="alert">
+            Post not deleted!
+        </div>
+    {% endif %}
+
+    <div id="col1">
+        <h2>Add to the Guestbook here!</h2>
+        <hr/>
+        {# form to add post to guestbook #}
+        <form action="index.php" method='post'>
+            <table>
+                <tr>
+                    <td>Name: </td>
+                    <td><input type='text' name='name' style='width: 250px;'/></td>
+                </tr>
+                <tr>
+                    <td>Email: </td>
+                    <td><input type='text' name='email' style='width: 250px;'/></td>
+                </tr>
+                <tr>
+                    <td>Message: </td>
+                    <td><textarea name='message' style='width: 250px; height: 100px;'></textarea></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td> <button name='postbtn'>Post</button></td>
+                </tr>
+            </table>
+        </form>
+
+
+    </div>
+
+    <div id="col2">
+        <div id="posts_list">
+
+            <h2>Current Posts</h2>
+
+            {% if num_rows > 0 %}
+                <hr/>
+                {% for i in range(0, num_rows-1) %}
+
+                    {# display delete button #}
+                    <form action='index.php' method='post'>
+                        <input type='hidden' name='id' value='{{ row[i].id }}'>
+                        <button name='deletebtn'>Delete</button>
+                    </form>
+
+                    {# display edit button #}
+                    <form action='edit-cmt.php' method='post' >
+                        <input type='hidden' name='id' value='{{ row[i].id }}'>
+                        <input type='hidden' name='name' value='{{ row[i].name }}'>
+                        <input type='hidden' name='email' value='{{ row[i].email }}'>
+                        <input type='hidden' name='message' value='{{ row[i].message }}'>
+                        <input type='hidden' name='time' value='{{ row[i].time }}'>
+                        <input type='hidden' name='date' value='{{ row[i].date }}'>
+                        <button name='editbtn'>Edit</button></form>
+
+                    {# display posts #}
+                    <div>
+                        By <b>{{ row[i].name }}</b> - at <b>{{ row[i].time }}</b> on <b>{{ row[i].date }} </b>
+                        <br/>{{ row[i].message }}
+                    </div><hr/>
+
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
