@@ -14,23 +14,27 @@
 <body>
 <div class="container">
 
-    {% if result_add_post == true %}
-        <div class="alert alert-success" role="alert">
-            Post added!
-        </div>
-        {# <span style="color:red;text-align:center;">Your post has been added!</span> #}
-    {% elseif result_add_post == false and is_post_add == true %}
-        <div class="alert alert-warning" role="alert">
-            You did not enter in all the required information!
-        </div>
-    {% elseif result_delete_post == true %}
-        <div class="alert alert-success" role="alert">
-            Post deleted!
-        </div>
-    {% elseif result_delete_post == false and is_post_delete == true %}
-        <div class="alert alert-warning" role="alert">
-            Post not deleted!
-        </div>
+    {{ dump (if_redirect) }}
+    {{ dump (result_add_post) }}
+    {% if if_redirect %}
+        {% if result_add_post %}
+            <div class="alert alert-success" role="alert">
+                Post added!
+            </div>
+            {# <span style="color:red;text-align:center;">Your post has been added!</span> #}
+        {% elseif result_add_post == false and is_post_add == true %}
+            <div class="alert alert-warning" role="alert">
+                You did not enter in all the required information!
+            </div>
+        {% elseif result_delete_post and if_redirect %}
+            <div class="alert alert-success" role="alert">
+                Post deleted!
+            </div>
+        {% elseif result_delete_post == false and is_post_delete == true %}
+            <div class="alert alert-warning" role="alert">
+                Post not deleted!
+            </div>
+        {% endif %}
     {% endif %}
 
     <div id="col1">
@@ -94,6 +98,20 @@
 
                 {% endfor %}
             {% endif %}
+
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
