@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
+
 $loader = new Twig_Loader_Filesystem(__DIR__);
 $twig = new Twig_Environment($loader, ['debug' => true], ['post' => $_POST]); #
 //$twig->addGlobal('session', $_SESSION);
@@ -8,15 +9,22 @@ $twig->addExtension(new \Twig\Extension\DebugExtension());
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
 session_start();
-$conn = new mysqli("localhost", "root", "root");
-mysqli_select_db($conn, "guestbook") or die (mysqli_error($conn));
+$conn = new mysqli("localhost", "root", "root", "guestbook");
+//mysqli_select_db($conn, "guestbook") or die (mysqli_error($conn));
 $sql_display = mysqli_query($conn, "SELECT * FROM guestbook ORDER BY id DESC");
 $num_rows = mysqli_num_rows($sql_display);
+$sql_pagination = mysqli_query($conn, "SELECT * FROM guestbook");
 
 $is_post_add = false;
 $is_post_delete = false;
 $result_add_post = false;
 $result_delete_post = false;
+$row_limit_pagination = 0;
+$results_per_page = 5;
+
+/*$paginator = new Paginator($conn, $query);
+$row = $paginator->getData($limit, $page, $twig);
+$page = $paginator->createLinks($links, 'pagination pagination-sm');*/
 
 function redirect_to( $location ) {
     if ($location != NULL) {
@@ -67,17 +75,40 @@ if ($_POST) {
     $if_redirect = redirect_to('index.php');
 }
 
-while ($results = mysqli_fetch_assoc($sql_display)) {
-    $row[] = $results;
+//calculate total number of pages
+$num_of_pages = ceil($num_rows/$results_per_page);
+
+//determine current page
+if (!isset($_GET['page'])){
+    $page = 1;
 }
+else{
+    $page = $_GET['page'];
+}
+
+//calculate LIMIT starting number for sql query
+$first_result = ($page - 1) * $results_per_page;
+
+//calculate LIMIT final number for sql query
+
+//retrieve results from DB
+$sql_pagination = "SELECT * FROM guestbook ORDER BY id DESC LIMIT ".$first_result.','.$results_per_page;
+$results_pagination = mysqli_query($conn, $sql_pagination);
+
+while ($results = mysqli_fetch_assoc($results_pagination) ) {
+
+    $row[] = $results;
+    $row_limit_pagination++;
+}
+
 
 echo $twig->render(
     'index.html.twig', array(
-        'sql_display' => $sql_display,
-        'num_rows' => $num_rows,
-        'row' => $row, 'postbtn' => 'postbtn',
+        'sql_display' => $sql_display, 'row' => $row,
+        'num_rows' => $num_rows, 'results_per_page' => $results_per_page,
+        'postbtn' => 'postbtn', 'row_limit_pagination' => $row_limit_pagination,
         'result_delete_post' => $result_delete_post,
-        'result_add_post' => $result_add_post
-
+        'result_add_post' => $result_add_post,
+        'page' => $page, 'num_of_pages' => $num_of_pages
     )
 );
