@@ -8,32 +8,41 @@
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet">
     <link href="style.css" rel="stylesheet" type="text/css"/>
-    <h1><a href="index.php" >Guestbook</a></h1>
+    <h1><a href="index.php">Guestbook</a></h1>
 
 </head>
 <body>
 <div class="container">
 
-    {% if if_redirect %}
         {% if result_add_post %}
             <div class="alert alert-success" role="alert">
                 Post added!
             </div>
-            {# <span style="color:red;text-align:center;">Your post has been added!</span> #}
-        {% elseif result_add_post == false and is_post_add == true %}
-            <div class="alert alert-warning" role="alert">
+        {% elseif email_validation == false and result_add_post == false and is_post_add == true %}
+            <div class="alert alert-danger" role="alert">
+                Email is invalid. Please enter a valid email.
+            </div>
+        {% elseif email_validation == true and result_add_post == false and is_post_add == true %}
+            <div class="alert alert-danger" role="alert">
                 You did not enter in all the required information!
             </div>
-        {% elseif result_delete_post and if_redirect %}
+        {% elseif result_delete_post %}
             <div class="alert alert-success" role="alert">
                 Post deleted!
             </div>
         {% elseif result_delete_post == false and is_post_delete == true %}
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-danger" role="alert">
                 Post not deleted!
             </div>
+        {% elseif result_edit_post %}
+            <div class="alert alert-success" role="alert">
+                Post edited!
+            </div>
+        {% elseif result_edit_post == false and is_post_edit == true %}
+            <div class="alert alert-danger" role="alert">
+                Post not edited! Please fill in all the required information.
+            </div>
         {% endif %}
-    {% endif %}
 
     <div id="col1">
         <h2>Add to the Guestbook here!</h2>
@@ -59,38 +68,23 @@
                 </tr>
             </table>
         </form>
-
-
     </div>
 
     <div id="col2">
         <div id="posts_list">
-
             <h2>Current Posts</h2>
             {% if num_rows > 0 %}
                 <hr/>
-                    {% for i in range(0, row_limit_pagination-1) %}  {# Paginator.result #}
-                        {# display delete button #}
-                        <form action='index.php' method='post'>
-                            <input type='hidden' name='id' value='{{ row[i].id }}'>
+                    {% for i in range(0, row_limit_pagination-1) %}
+
+                        {# display posts, edit & delete btn #}
+                        <div><form action="index.php" method="post">
+                            <button name='editbtn'>Edit</button>
                             <button name='deletebtn'>Delete</button>
-                        </form>
-
-                        {# display edit button #}
-                        <form action='edit-cmt.php' method='post' >
-                            <input type='hidden' name='id' value='{{ row[i].id }}'>
-                            <input type='hidden' name='name' value='{{ row[i].name }}'>
-                            <input type='hidden' name='email' value='{{ row[i].email }}'>
-                            <input type='hidden' name='message' value='{{ row[i].message }}'>
-                            <input type='hidden' name='time' value='{{ row[i].time }}'>
-                            <input type='hidden' name='date' value='{{ row[i].date }}'>
-                            <button name='editbtn'>Edit</button></form>
-
-
-                        {# display posts #}
-                        <div>
-                            By <b>{{ row[i].name }}</b> - at <b>{{ row[i].time }}</b> on <b>{{ row[i].date }} </b>
-                            <br/>{{ row[i].message }}
+                            By <b>{{ row[i].name }}</b> - at <b>{{ row[i].time }}</b> on
+                                <b>{{ row[i].date }} </b>
+                            <input type='text' name='message' value='{{ row[i].message }}'/>
+                            <input type='hidden' name='id' value='{{ row[i].id }}'/></form>
                         </div><hr/>
 
                 {% endfor %}
@@ -98,16 +92,30 @@
 
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-end">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Previous</a>
-                    </li>
+                    {% if page == 1 %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="index.php?page={{ page-1 }}">Previous</a>
+                        </li>
+                    {% endif %}
+
                     {% for page in range (1, num_of_pages) %}
-                    <li class="page-item"><a class="page-link" href="index.php?page={{ page }}">{{ page }}</a></li>
+                        <li class="page-item"><a class="page-link" href="index.php?page={{ page }}">
+                                {{ page }}</a></li>
                     {% endfor %}
 
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
+                    {% if page == num_of_pages %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="index.php?page={{ page+1 }}">Next</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
