@@ -3,4 +3,10 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
+  <component name="ProjectPlainTextFileTypeManager">
+    <file url="file://$PROJECT_DIR$/error.php" />
+  </component>
+  <component name="ProjectResources">
+    <resource url="https://fonts.googleapis.com/css?family=Raleway" location="$PROJECT_DIR$" />
+  </component>
 </project>

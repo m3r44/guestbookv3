@@ -6,4 +6,6 @@
 /public/bundles/
 /var/
 /vendor/
+/startbootstrap-bare-gh-pages/
+/.idea/workspace.xml
 ###< symfony/framework-bundle ###
