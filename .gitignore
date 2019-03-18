@@ -8,4 +8,5 @@
 /vendor/
 /startbootstrap-bare-gh-pages/
 /.idea/workspace.xml
+/uploads/
 ###< symfony/framework-bundle ###

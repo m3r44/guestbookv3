@@ -51,11 +51,24 @@ if ($_POST) {
             if($name && $email && $message) {
                 $time = date("h:i A");
                 $date = date("F d, Y");
-                $sql_add_post = "INSERT INTO guestbook (name, email, message, time, date) VALUES 
-                            ('$name', '$email', '$message', '$time', '$date')";
-                $result_add_post = mysqli_query($conn, $sql_add_post);
+
                 //break long strings
                 $message = wordwrap($message, 50,"\n", true);
+
+                if (!empty($_FILES['uploaded_file']) ) {    //&& isset($_POST['upload'])
+                    $target_dir = "uploads/";
+                    $file_name = basename($_FILES['uploaded_file']['name']);
+                    $path = $target_dir . $file_name;
+                    $file_type = pathinfo($path, PATHINFO_EXTENSION);
+                    if (move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $path)) {
+                        $sql_add_post = "INSERT into guestbook (name, email, message, image, time, date) VALUES 
+                          ('$name', '$email', '$message', '" . $file_name . "', '$time', '$date')";
+                        $result_add_post = mysqli_query($conn, $sql_add_post);
+                    }
+                }
+                else{
+                    echo "Please choose a file to upload";
+                }
             }
             else{
                 $result_add_post = false;
@@ -90,6 +103,9 @@ if ($_POST) {
             $result_edit_post = false;
         }
     }
+
+
+
 }
 
 #calculate total number of pages
@@ -113,6 +129,8 @@ while ($results = mysqli_fetch_assoc($results_pagination) ) {
     $row[] = $results;
     $row_limit_pagination++;    #sets last limit
 }
+
+
 
 echo $twig->render(
     'posts.html.twig', array(

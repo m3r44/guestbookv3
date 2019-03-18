@@ -48,21 +48,30 @@
 
     <div id="col1">
         <h2 >Hello, {{ fName }} {{ lName }}!
-            <a class="signout" style=" font-size: 11px; color: blue" href="logout.php" >Sign Out</a></h2>
+            <a class="signout" style=" font-size: 11px; color: blue" href="logout.php" >Sign Out</a>
+        </h2>
         <hr/>
         {# form to add post to guestbook #}
-        <form id="posts" action="posts.php" method='post'>
-            <table>
+        <form id="posts" enctype="multipart/form-data" action="posts.php" method='post'>
+            <table class="change_size">
                 <tr>
                     <td>Message: </td>
                 </tr>
                 <tr>
-                    <td><textarea name='message' style='width: 350px; height: 100px;'
+                    <td><textarea name='message' style='width: 380px; height: 100px;'
                                   placeholder="Write your message here.."></textarea></td>
                 </tr>
-                <tr>
+            </table>
 
-                    <td> <button name='postbtn'>Post</button></td>
+            <table class="change_size">
+                <tr>
+                    <td>Upload your file: </td>
+                </tr>
+                <tr>
+                    <td><input type="file" name="uploaded_file"></input><br /></td>
+                </tr>
+                <tr>
+                    <div> <button style="margin: 10px" name='postbtn'>Post</button></div>
                 </tr>
             </table>
         </form>
@@ -74,15 +83,21 @@
             {% if num_rows > 0 %}
                 <hr/>
                     {% for i in range(0, row_limit_pagination-1) %}
-
                         {# display posts, edit & delete btn #}
                         <div><form action="posts.php" method="post">
                             <div class="action-button">
-                                <button name='editbtn'>Edit</button>
-                                <button class="deletebtn" name='deletebtn' style="display: block; margin-right: 4px">Delete</button>
+                                <button style="margin-bottom: 10px" name='editbtn'>Edit</button>
+                                <button style="display: block; margin-right: 4px" name='deletebtn' >Delete</button>
                             </div>
                             By <b>{{ row[i].name }}</b> - at <b>{{ row[i].time }}</b> on
-                                <b>{{ row[i].date }} </b>
+                                <b>{{ row[i].date }} </b> <br/>
+                            {% if row[i].image is not null %}
+                                <img id="myImg" class="noStretch" src="uploads/{{ row[i].image }}" alt="image"/>
+                                <div id="myModal" class="modal">
+                                    <span class="close">&times;</span>
+                                    <img class="modal-content" id="img01">
+                                </div>
+                            {% endif %}
                             <input type='text' name='message' value='{{ row[i].message }}'/>
                             <input type='hidden' name='id' value='{{ row[i].id }}'/></form>
                         </div><hr/>
@@ -156,7 +171,30 @@
     });
 </script>
 
+<script>
+    // Get the modal
+    var modal = document.getElementById('myModal');
+
+    // Get the image and insert it inside the modal - use its "alt" text as a caption
+    var img = document.getElementById('myImg');
+    var modalImg = document.getElementById("img01");
+    //var captionText = document.getElementById("caption");
+    img.onclick = function(){
+    modal.style.display = "block";
+    modalImg.src = this.src;
+    //captionText.innerHTML = this.alt;
+    }
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+</script>
 </body>
+
 <footer>
-    Total posts: {{ num_rows }}
+    Total posts: {{ num_rows }} <br>
 </footer>
