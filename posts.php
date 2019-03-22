@@ -171,7 +171,6 @@ while ($results = mysqli_fetch_assoc($results_pagination) ) {
     $row_limit_pagination++;    #sets last limit
 }
 
-var_dump($result_add_post);
 
 echo $twig->render(
     'posts.html.twig', array(
