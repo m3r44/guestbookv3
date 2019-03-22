@@ -16,6 +16,9 @@ h2{
     text-align: left;
     font-size: 18px;
 }
+video{margin: 10px;}
+
+audio{margin: 10px;}
 
 img {
     width: 100px;

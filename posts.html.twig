@@ -15,10 +15,9 @@
 </head>
 <body>
 <div class="container">
-
-        {% if result_add_post %}
+        {% if is_post_add and result_add_post and is_upload %}
             <div class="alert alert-success" role="alert">
-                Post added!
+                File uploaded successfully!
             </div>
         {% elseif email_validation == false and result_add_post == false and is_post_add == true %}
             <div class="alert alert-danger" role="alert">
@@ -27,6 +26,14 @@
         {% elseif email_validation == true and result_add_post == false and is_post_add == true %}
             <div class="alert alert-danger" role="alert">
                 You did not enter in all the required information!
+            </div>
+        {% elseif is_post_add and result_add_post == false and is_upload == false %}
+            <div class="alert alert-danger" role="alert">
+                File not supported, try again!
+            </div>
+        {% elseif is_post_add and result_add_post and is_upload == false %}
+            <div class="alert alert-success" role="alert">
+                Post added!
             </div>
         {% elseif result_delete_post %}
             <div class="alert alert-success" role="alert">
@@ -45,33 +52,36 @@
                 Post not edited! Please fill in all the required information.
             </div>
         {% endif %}
+        <script>
+            window.onload = function() {
+                history.replaceState("", "", "posts.php");
+            }
+        </script>
 
     <div id="col1">
         <h2 >Hello, {{ fName }} {{ lName }}!
-            <a class="signout" style=" font-size: 11px; color: blue" href="logout.php" >Sign Out</a>
+            <a class="signout" style=" font-size: 11px; color: blue" name="signout" href="logout.php" >Sign Out</a>
         </h2>
         <hr/>
         {# form to add post to guestbook #}
         <form id="posts" enctype="multipart/form-data" action="posts.php" method='post'>
             <table class="change_size">
                 <tr>
-                    <td>Message: </td>
-                </tr>
-                <tr>
-                    <td><textarea name='message' style='width: 380px; height: 100px;'
-                                  placeholder="Write your message here.."></textarea></td>
+                    <textarea name='message' style='width: 100%; height: 20%;'
+                                  placeholder="Write your message here.. (required)" required></textarea>
                 </tr>
             </table>
 
+            <br/>
             <table class="change_size">
                 <tr>
                     <td>Upload your file: </td>
                 </tr>
                 <tr>
-                    <td><input type="file" name="uploaded_file"></input><br /></td>
+                    <td><input type="file" name="uploaded_file"><br /></td>
                 </tr>
                 <tr>
-                    <div> <button style="margin: 10px" name='postbtn'>Post</button></div>
+                    <div> <button style="margin-top: 10px" name='postbtn'>Post</button></div>
                 </tr>
             </table>
         </form>
@@ -86,19 +96,29 @@
                         {# display posts, edit & delete btn #}
                         <div><form action="posts.php" method="post">
                             <div class="action-button">
-                                <button style="margin-bottom: 10px" name='editbtn'>Edit</button>
-                                <button style="display: block; margin-right: 4px" name='deletebtn' >Delete</button>
+                                <button style="margin-bottom: 10px" name="editbtn">Edit</button>
+                                <button style="display: block; margin-right: 4px" class="deletebtn" name="deletebtn">Delete</button>
                             </div>
                             By <b>{{ row[i].name }}</b> - at <b>{{ row[i].time }}</b> on
                                 <b>{{ row[i].date }} </b> <br/>
                             {% if row[i].image is not null %}
-                                <img id="myImg" class="noStretch" src="uploads/{{ row[i].image }}" alt="image"/>
-                                <div id="myModal" class="modal">
-                                    <span class="close">&times;</span>
-                                    <img class="modal-content" id="img01">
-                                </div>
+                                {% if row[i].type == "image" %}
+                                    <img id="myImg" class="noStretch" src="uploads/{{ row[i].image }}" alt="image"/>
+                                    <div id="myModal" class="modal">
+                                        <span class="close">&times;</span>
+                                        <img class="modal-content" id="img01">
+                                    </div>
+                                {% elseif row[i].type == "video"%}
+                                    <video width="350" height="200" controls>
+                                        <source src="uploads/{{ row[i].image }}" type="video/mp4">
+                                    </video>
+                                {% elseif row[i].type == "audio" %}
+                                    <audio cotrols>
+                                        <source src="uploads/{{ row[i].image }}" type="audio/mpeg"/>
+                                    </audio>
+                                {% endif %}
                             {% endif %}
-                            <input type='text' name='message' value='{{ row[i].message }}'/>
+                            <input type='text' name='message' value='{{ row[i].message }}' required/>
                             <input type='hidden' name='id' value='{{ row[i].id }}'/></form>
                         </div><hr/>
 
@@ -161,10 +181,10 @@
 
 <script type="text/javascript">
     $(function(){
-        $('.signout').on('click', function (e) {
+        $('.signout').on('click', function (f) {
             let status = confirm('Are you sure you want to sign out?');
             if (!status){
-                e.preventDefault();
+                f.preventDefault();
                 return false;
             }
         })
@@ -193,6 +213,8 @@
       modal.style.display = "none";
     }
 </script>
+
+
 </body>
 
 <footer>

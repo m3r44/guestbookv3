@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
+session_start();
 
 $loader = new Twig_Loader_Filesystem(__DIR__);
 $twig = new Twig_Environment($loader, ['debug' => true], ['post' => $_POST]);
@@ -8,7 +9,6 @@ $twig = new Twig_Environment($loader, ['debug' => true], ['post' => $_POST]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
-session_start();
 if(!$_SESSION['logged_in']){
     header("location: index.php");
 }
@@ -35,6 +35,11 @@ $result_delete_post = false;
 $row_limit_pagination = 0;
 $results_per_page = 4;
 $email_validation = null;
+$is_upload = false;
+
+$img_ext = array("png", "jpeg", "jpg", "gif");
+$video_ext = array("mp4", "mp4","avi","flv","mov","mpeg");
+$audio_ext = array("mp3", "flac", "wav", "alac");
 
 if ($_POST) {
     # Condition to add post
@@ -54,23 +59,58 @@ if ($_POST) {
 
                 //break long strings
                 $message = wordwrap($message, 50,"\n", true);
+                //$message = nl2br($message);
 
-                if (!empty($_FILES['uploaded_file']) ) {    //&& isset($_POST['upload'])
+                #check for any uploaded files
+                if (is_uploaded_file($_FILES['uploaded_file']['tmp_name'])) {
                     $target_dir = "uploads/";
                     $file_name = basename($_FILES['uploaded_file']['name']);
                     $path = $target_dir . $file_name;
-                    $file_type = pathinfo($path, PATHINFO_EXTENSION);
+                    $file_type = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+                    #if successfully moved file to folder uploads/
                     if (move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $path)) {
-                        $sql_add_post = "INSERT into guestbook (name, email, message, image, time, date) VALUES 
-                          ('$name', '$email', '$message', '" . $file_name . "', '$time', '$date')";
-                        $result_add_post = mysqli_query($conn, $sql_add_post);
+                        if (in_array($file_type, $img_ext)){    #if file is an image
+                            $sql_type = "image";
+                            $sql_add_post = "INSERT into guestbook (name, email, message, image, type, time, date) VALUES 
+                            ('$name', '$email', '$message', '" . $file_name . "', '$sql_type', '$time', '$date')";
+                            $result_add_post = mysqli_query($conn, $sql_add_post);
+                            $is_upload = true;
+                        }
+                        elseif (in_array($file_type, $video_ext)) {     #if file is a video
+                            $sql_type = "video";
+                            $sql_add_post = "INSERT into guestbook (name, email, message, image, type, time, date) VALUES 
+                            ('$name', '$email', '$message', '" . $file_name . "', '$sql_type', '$time', '$date')";
+                            $result_add_post = mysqli_query($conn, $sql_add_post);
+                            $is_upload = true;
+                        }
+                        elseif (in_array($file_type, $audio_ext)){      #if file is audio
+                            $sql_type = "audio";
+                            $sql_add_post = "INSERT into guestbook (name, email, message, image, type, time, date) VALUES 
+                            ('$name', '$email', '$message', '" . $file_name . "', '$sql_type', '$time', '$date')";
+                            $result_add_post = mysqli_query($conn, $sql_add_post);
+                            $is_upload = true;
+                        }
+                        else{       #if file has other unsupported extensions
+                            $is_upload = false;
+                            $result_add_post = false;
+                        }
+                    }
+                    else{       #if file upload failed
+                        $is_upload = false;
+                        $result_add_post = false;
                     }
                 }
-                else{
-                    echo "Please choose a file to upload";
+                else{       #if no file is uploaded, post only message
+
+                    $sql_add_post = "INSERT into guestbook (name, email, message, time, date) VALUES 
+                          ('$name', '$email', '$message', '$time', '$date')";
+                    $result_add_post = mysqli_query($conn, $sql_add_post);
+                    $is_upload = false;
                 }
+
             }
-            else{
+            else{       #if required entries are missing
                 $result_add_post = false;
             }
         }
@@ -93,11 +133,12 @@ if ($_POST) {
         $is_post_edit = true;
         $id = $_POST['id'];
         $message = strip_tags($_POST['message']);
-        //$message = $_POST['message'];
 
         if ($message){
             $sql_edit_post = "UPDATE guestbook SET message = '$message' WHERE id = $id";
             $result_edit_post = mysqli_query($conn, $sql_edit_post);
+            $result_edit_post = true;
+
         }
         else{
             $result_edit_post = false;
@@ -130,7 +171,7 @@ while ($results = mysqli_fetch_assoc($results_pagination) ) {
     $row_limit_pagination++;    #sets last limit
 }
 
-
+var_dump($result_add_post);
 
 echo $twig->render(
     'posts.html.twig', array(
@@ -142,6 +183,6 @@ echo $twig->render(
         'result_edit_post' => $result_edit_post, 'is_post_edit' => $is_post_edit,
         'result_delete_post' => $result_delete_post, 'is_post_delete' => $is_post_delete,
         'email_validation' => $email_validation, 'fName' => $fName, 'lName' => $lName,
-        'email' => $email_DB
+        'email' => $email_DB, 'is_upload' => $is_upload
     )
 );
