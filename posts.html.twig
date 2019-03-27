@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head xmlns="http://www.w3.org/1999/html" xmlns:style="http://www.w3.org/1999/xhtml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -15,48 +17,48 @@
 </head>
 <body>
 <div class="container">
-        {% if is_post_add and result_add_post and is_upload %}
-            <div class="alert alert-success" role="alert">
-                File uploaded successfully!
-            </div>
-        {% elseif email_validation == false and result_add_post == false and is_post_add == true %}
-            <div class="alert alert-danger" role="alert">
-                Email is invalid. Please enter a valid email.
-            </div>
-        {% elseif email_validation == true and result_add_post == false and is_post_add == true %}
-            <div class="alert alert-danger" role="alert">
-                You did not enter in all the required information!
-            </div>
-        {% elseif is_post_add and result_add_post == false and is_upload == false %}
-            <div class="alert alert-danger" role="alert">
-                File not supported, try again!
-            </div>
-        {% elseif is_post_add and result_add_post and is_upload == false %}
-            <div class="alert alert-success" role="alert">
-                Post added!
-            </div>
-        {% elseif result_delete_post %}
-            <div class="alert alert-success" role="alert">
-                Post deleted!
-            </div>
-        {% elseif result_delete_post == false and is_post_delete == true %}
-            <div class="alert alert-danger" role="alert">
-                Post not deleted!
-            </div>
-        {% elseif result_edit_post %}
-            <div class="alert alert-success" role="alert">
-                Post edited!
-            </div>
-        {% elseif result_edit_post == false and is_post_edit == true %}
-            <div class="alert alert-danger" role="alert">
-                Post not edited! Please fill in all the required information.
-            </div>
-        {% endif %}
-        <script>
-            window.onload = function() {
-                history.replaceState("", "", "posts.php");
-            }
-        </script>
+
+    {% if session.delete is defined %}
+        <div class="alert alert-success" role="alert">
+            {{ session.delete }}
+        </div>
+    {% elseif session.add is defined %}
+        <div class="alert alert-success" role="alert">
+            {{ session.add }}
+        </div>
+    {% elseif session.edit is defined %}
+        <div class="alert alert-success" role="alert">
+            {{ session.edit }}
+        </div>
+    {% elseif session.add_file is defined %}
+        <div class="alert alert-success" role="alert">
+            {{ session.add_file }}
+        </div>
+    {% elseif session.edit_fail is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.add_fail }}
+        </div>
+    {% elseif session.edit_fail is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.edit_fail }}
+        </div>
+    {% elseif session.edit_fail is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.delete_fail }}
+        </div>
+    {% elseif session.edit_fail is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.add_file_fail }}
+        </div>
+    {% elseif session.edit_fail is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.add_fail_info }}
+        </div>
+    {% elseif session.edit_fail is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.add_file_fail_ext }}
+        </div>
+    {% endif %}
 
     <div id="col1">
         <h2 >Hello, {{ fName }} {{ lName }}!
@@ -140,17 +142,15 @@
                     {% set currentPage = page %}
                     {% for page in range (1, num_of_pages) %}
                         {% if page == currentPage %}
-                        <li class="page-item active">
-                            <a class="page-link" href="posts.php?page={{ page }}">
-                                {{ page }}<span class="sr-only">(current)</span></a>
-                        </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="posts.php?page={{ page }}">
+                                    {{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
                         {% else %}
-                        <li class="page-item"><a class="page-link" href="posts.php?page={{ page }}">
-                                {{ page }}</a></li>
+                            <li class="page-item"><a class="page-link" href="posts.php?page={{ page }}">
+                                    {{ page }}</a></li>
                         {% endif %}
                     {% endfor %}
-
-
 
                     {% if page == num_of_pages %}
                         <li class="page-item disabled">
@@ -213,8 +213,6 @@
       modal.style.display = "none";
     }
 </script>
-
-
 </body>
 
 <footer>

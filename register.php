@@ -42,4 +42,3 @@ else{   #email doesn't already exist in DB, proceed
     }
 }
 
-//$twig->render('index.php', array('email_exist'=>$email_exist, 'register_success'=>$register_success));

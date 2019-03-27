@@ -1,8 +1,11 @@
 <?php
 
+use utility\Session;
+error_reporting(E_ALL^E_NOTICE);
 require_once __DIR__ . '/vendor/autoload.php';
-session_start();
+include_once('Session.php');
 
+$session = new Session();
 $loader = new Twig_Loader_Filesystem(__DIR__);
 $twig = new Twig_Environment($loader, ['debug' => true], ['post' => $_POST]);
 //$twig->addGlobal('session', $_SESSION);
@@ -75,78 +78,111 @@ if ($_POST) {
                             $sql_add_post = "INSERT into guestbook (name, email, message, image, type, time, date) VALUES 
                             ('$name', '$email', '$message', '" . $file_name . "', '$sql_type', '$time', '$date')";
                             $result_add_post = mysqli_query($conn, $sql_add_post);
-                            $is_upload = true;
+                            //$is_upload = true;
+                            $session->flash('add_file', 'File successfully uploaded!');
+                            header("Location: " . $_SERVER['REQUEST_URI']);
+                            exit();
                         }
                         elseif (in_array($file_type, $video_ext)) {     #if file is a video
                             $sql_type = "video";
                             $sql_add_post = "INSERT into guestbook (name, email, message, image, type, time, date) VALUES 
                             ('$name', '$email', '$message', '" . $file_name . "', '$sql_type', '$time', '$date')";
                             $result_add_post = mysqli_query($conn, $sql_add_post);
-                            $is_upload = true;
+                            //$is_upload = true;
+                            $session->flash('add_file', 'File successfully uploaded!');
+                            header("Location: " . $_SERVER['REQUEST_URI']);
+                            exit();
                         }
                         elseif (in_array($file_type, $audio_ext)){      #if file is audio
                             $sql_type = "audio";
                             $sql_add_post = "INSERT into guestbook (name, email, message, image, type, time, date) VALUES 
                             ('$name', '$email', '$message', '" . $file_name . "', '$sql_type', '$time', '$date')";
                             $result_add_post = mysqli_query($conn, $sql_add_post);
-                            $is_upload = true;
+                            //$is_upload = true;
+                            $session->flash('add_file', 'File successfully uploaded!');
+                            header("Location: " . $_SERVER['REQUEST_URI']);
+                            exit();
                         }
                         else{       #if file has other unsupported extensions
-                            $is_upload = false;
-                            $result_add_post = false;
+                            //$is_upload = false;
+                            //$result_add_post = false;
+                            $session->flash('add_file_fail_ext', 'File not supported, try again!');
+                            header("Location: " . $_SERVER['REQUEST_URI']);
+                            exit();
                         }
                     }
                     else{       #if file upload failed
-                        $is_upload = false;
-                        $result_add_post = false;
+                        //$is_upload = false;
+                        //$result_add_post = false;
+                        $session->flash('add_file_fail', 'File upload failed, try again!');
+                        header("Location: " . $_SERVER['REQUEST_URI']);
+                        exit();
                     }
                 }
                 else{       #if no file is uploaded, post only message
-
                     $sql_add_post = "INSERT into guestbook (name, email, message, time, date) VALUES 
                           ('$name', '$email', '$message', '$time', '$date')";
                     $result_add_post = mysqli_query($conn, $sql_add_post);
-                    $is_upload = false;
+                    //$is_upload = false;
+                    $session->flash('add', 'Post successfully added!');
+                    header("Location: " . $_SERVER['REQUEST_URI']);
+                    exit();
                 }
 
             }
             else{       #if required entries are missing
-                $result_add_post = false;
+                //$result_add_post = false;
+                $session->flash('add_fail_info', 'You did not enter in all the required information!');
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit();
             }
         }
         else{   #email is invalid
-            $email_validation = false;
-            $result_add_post = false;
+            //$email_validation = false;
+            //$result_add_post = false;
         }
     }
 
     # Condition to delete post
     if (isset($_POST['deletebtn'])) {
-        $is_post_delete = true;
+        //$is_post_delete = true;
         $id = $_POST['id'];
         $sql_delete_post = "DELETE FROM guestbook WHERE id = $id";
         $result_delete_post = mysqli_query($conn, $sql_delete_post);
+
+        if ($result_delete_post == true){
+            $session->flash('delete', 'Post successfully deleted!');
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit();
+        }
+        else{
+            $session->flash('delete_fail', 'Post not deleted, please try again');
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
+        }
+
     }
 
     # Condition to edit post
     if (isset($_POST['editbtn'])) {
-        $is_post_edit = true;
+        //$is_post_edit = true;
         $id = $_POST['id'];
         $message = strip_tags($_POST['message']);
 
         if ($message){
             $sql_edit_post = "UPDATE guestbook SET message = '$message' WHERE id = $id";
             $result_edit_post = mysqli_query($conn, $sql_edit_post);
-            $result_edit_post = true;
-
+            $session->flash('edit', 'Post successfully edited!');
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
         }
         else{
-            $result_edit_post = false;
+            //$_SESSION['result_edit_post'] = false;
+            $session->flash('edit_fail', 'Post not edited, please fill in the message');
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
         }
     }
-
-
-
 }
 
 #calculate total number of pages
@@ -171,18 +207,18 @@ while ($results = mysqli_fetch_assoc($results_pagination) ) {
     $row_limit_pagination++;    #sets last limit
 }
 
-var_dump($result_add_post);
-
 echo $twig->render(
     'posts.html.twig', array(
         'sql_display' => $sql_display, 'row' => $row,
-        'num_rows' => $num_rows, 'results_per_page' => $results_per_page,
-        'postbtn' => 'postbtn', 'row_limit_pagination' => $row_limit_pagination,
-        'page' => $page, 'num_of_pages' => $num_of_pages,
-        'result_add_post' => $result_add_post, 'is_post_add' => $is_post_add,
-        'result_edit_post' => $result_edit_post, 'is_post_edit' => $is_post_edit,
-        'result_delete_post' => $result_delete_post, 'is_post_delete' => $is_post_delete,
-        'email_validation' => $email_validation, 'fName' => $fName, 'lName' => $lName,
-        'email' => $email_DB, 'is_upload' => $is_upload
+        'num_rows' => $num_rows, 'results_per_page' => $results_per_page, 'postbtn' => 'postbtn',
+        'row_limit_pagination' => $row_limit_pagination, 'fName' => $fName, 'lName' => $lName,
+        'page' => $page, 'num_of_pages' => $num_of_pages, 'session' => $_SESSION,
+
+        'delete' => $session->get('delete'), 'add' => $session->get('add'), 'edit' => $session->get('edit'),
+        'add_file' => $session->get('add_file'), 'add_file_fail' => $session->get('add_file_fail'),
+        'edit_fail' => $session->get('edit_fail'), 'add_fail' => $session->get('add_fail'),
+        'delete_fail' => $session->get('delete_fail'), 'add_fail_info' => $session->get('add_fail_info'),
+        'add_file_fail_ext' => $session->get('add_file_fail_ext'),
+
     )
 );
