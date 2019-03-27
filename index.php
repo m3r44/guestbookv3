@@ -18,8 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 //var_dump($_SESSION);
-echo $twig->render('index.twig', array('correct_pw' => $_SESSION['correct_pw'], 'email_exist'=>$_SESSION['email_exist'],
-    'is_login'=>$_SESSION['is_login'], 'register_success'=>$_SESSION['register_success'], 'is_register'=>$_SESSION['is_register']));
+echo $twig->render('index.twig', array('correct_pw' => $_SESSION['correct_pw'],
+    'email_exist'=>$_SESSION['email_exist'], 'is_login'=>$_SESSION['is_login'],
+    'register_success'=>$_SESSION['register_success'], 'email'=>$_SESSION['email'],
+    'f_name'=>$_SESSION['first_name'], 'l_name'=>$_SESSION['last_name'],
+    'is_register'=>$_SESSION['is_register']));
 
-//session_unset();
 
