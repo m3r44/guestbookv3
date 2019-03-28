@@ -61,7 +61,7 @@
     {% endif %}
 
     <div id="col1">
-        <h2 >Hello, {{ fName }} {{ lName }}!
+        <h2 >Hello, {{ name }}!
             <a class="signout" style=" font-size: 11px; color: blue" name="signout" href="logout.php" >Sign Out</a>
         </h2>
         <hr/>
@@ -69,7 +69,7 @@
         <form id="posts" enctype="multipart/form-data" action="posts.php" method='post'>
             <table class="change_size">
                 <tr>
-                    <textarea name='message' style='width: 100%; height: 20%;'
+                    <textarea name='message' style='width: 100%; height: 150%;'
                                   placeholder="Write your message here.. (required)" required></textarea>
                 </tr>
             </table>

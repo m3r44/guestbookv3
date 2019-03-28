@@ -2,43 +2,40 @@
 #registration process, inserts user info into the DB
 
 #set session variables
-$_SESSION['email'] = $_POST['email'];
-$_SESSION['first_name'] = $_POST['first_name'];
-$_SESSION['last_name'] = $_POST['last_name'];
-$_SESSION['is_register'] = true;
+$session->set('email', $_POST['email']);
+$session->set('first_name', $_POST['first_name']);
+$session->set('last_name', $_POST['last_name']);
 
 #escape all $_POST variables to protect against SQL injections
-$first_name = $mysqli->escape_string($_POST['first_name']);
-$last_name = $mysqli->escape_string($_POST['last_name']);
-$email = $mysqli->escape_string($_POST['email']);
-$password = $mysqli->escape_string(password_hash($_POST['password'], PASSWORD_BCRYPT));
-$hash = $mysqli->escape_string(md5(rand(0,1000)));
+$first_name = $userInfo->getPostObject($_POST['first_name']);
+$last_name = $userInfo->getPostObject($_POST['last_name']);
+$email = $userInfo->getPostObject($_POST['email']);
+$password = $userInfo->getPostObject(password_hash($_POST['password'], PASSWORD_BCRYPT));
+$hash = $userInfo->getPostObject(md5(rand(0,1000)));
 
 #check if user with that email already exists
-$result = $mysqli->query("SELECT * FROM users WHERE email='$email'") or die($mysqli->error());
+$result = $userInfo->getUserInfoByEmail($email);
 
 #we know user email exists if the rows returned are > 0
 if ($result->num_rows > 0){
-    $_SESSION['email_exist'] = true;
-    $_SESSION['register_success'] = false;
-    header("location: index.php");
+    $session->flash('email_exist', 'User with that email already exists!');
+    $session->redirect('index.php');
 }
 else{   #email doesn't already exist in DB, proceed
-
     #active is 0 by default
     $sql = "INSERT INTO users (first_name, last_name, email, password, hash) " .
         "VALUES ('$first_name', '$last_name', '$email', '$password', '$hash')";
 
     #add user to the DB
-    if ($mysqli->query($sql)){
-        $_SESSION['active'] = 1;
-        //$_SESSION['logged_in'] = true;
-        $_SESSION['register_success'] = true;
-        header("location: index.php");
+    if ($sqlController->post($sql)){
+        $session->set('active', 1);
+
+        $session->flash('reg_success', 'Your account has been created! Please sign in.');
+        $session->redirect('index.php');
     }
     else{
-        $_SESSION['register_success'] = false;
-        header("location: index.php");
+        $session->flash('reg_fail', 'Error, registration failed!');
+        $session->redirect('index.php');
     }
 }
 

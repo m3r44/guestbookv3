@@ -13,7 +13,8 @@
         "symfony/framework-bundle": "4.2.*",
         "symfony/yaml": "4.2.*",
         "twbs/bootstrap": "4.0.0",
-        "twig/twig": "^2.0"
+        "twig/twig": "^2.0",
+      "ext-mysqli": "*"
     },
     "config": {
         "preferred-install": {

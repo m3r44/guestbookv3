@@ -12,7 +12,6 @@
 </head>
 <script src="index.js"></script>
 <body>
-
 <div class="form-wrap">
     <div class="tabs">
         <h3 class="signup-tab"><a class="active" href="#signup-tab-content">Sign Up</a></h3>
@@ -21,17 +20,18 @@
 
     <div class="tabs-content">
         <div id="login-tab-content">
-            {% if is_login and email_exist and correct_pw == false %}
-            <div class="alert alert-danger" role="alert">
-                You have entered wrong password, try again!
-            </div>
-            {% elseif is_login and email_exist == false %}
-            <div class="alert alert-danger" role="alert">
-                User with that email doesn't exist!
-            </div>
+            {% if email_not_exist is not null %}
+                <div class="alert alert-danger" role="alert">
+                    {{ email_not_exist }}
+                </div>
+            {% elseif wrong_pw is not null %}
+                <div class="alert alert-danger" role="alert">
+                    {{ wrong_pw }}
+                </div>
             {% endif %}
+
             <form class="login-form" action="index.php" method="post">
-                <input type="text" class="input" name="email" id="user_login" autocomplete="off"
+                <input type="email" class="input" name="email" id="user_login" autocomplete="off"
                        placeholder="Email" required>
                 <input type="password" class="input" name="password" id="user_pass" autocomplete="off"
                        placeholder="Password" required>
@@ -41,19 +41,18 @@
 
 
         <div id="signup-tab-content"  class="active">
-            {% if is_register and email_exist and register_success == false %}
+            {% if email_exist is not null %}
                 <div class="alert alert-danger" role="alert">
-                    User with this email already exists!
+                    {{ email_exist }}
                 </div>
-            {% elseif is_register and register_success %}
+            {% elseif reg_fail is not null %}
+                <div class="alert alert-danger" role="alert">
+                    {{ reg_fail }}
+                </div>
+            {% elseif reg_success is not null %}
                 <div class="alert alert-success" role="alert">
-                    Your account has been created!
+                    {{ reg_success }}
                 </div>
-            {% elseif is_register and register_success == false %}
-                <div class="alert alert-danger" role="alert">
-                    Registration failed!
-                </div>
-
             {% endif %}
 
             <form class="signup-form" action="index.php" method="post">

@@ -1,27 +1,39 @@
 <?php
 error_reporting(E_ALL^E_NOTICE);
-$mysqli = new mysqli("localhost", "root", "root", "guestbook");
-session_start();
+
+use utility\Session;
+include "Session.php";
+include "SQL_Controller.php";
+include "GetUser.php";
+$session = new Session();
+$sqlController = new SQL_Controller();
+$userInfo = new getUser();
 
 require_once __DIR__ . '/vendor/autoload.php';
 $loader = new Twig_Loader_Filesystem(__DIR__);
-$twig = new Twig_Environment($loader, ['session' => $_SESSION]);
+$twig = new Twig_Environment($loader, ['debug' => true]);
 $twig->addExtension(new \Twig\Extension\DebugExtension());
-$twig->addGlobal('session', $_SESSION);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if (isset($_POST['login'])){
-        require 'login.php';
-    }
-    elseif (isset($_POST['register'])){
-        require 'register.php';
+if($session->check('logged_in') == true) {
+    header("location: posts.php");
+    exit;
+}
+else{
+    if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if (isset($_POST['login'])){
+            require 'login.php';
+        }
+        elseif (isset($_POST['register'])){
+            require 'register.php';
+        }
     }
 }
-//var_dump($_SESSION);
-echo $twig->render('index.twig', array('correct_pw' => $_SESSION['correct_pw'],
-    'email_exist'=>$_SESSION['email_exist'], 'is_login'=>$_SESSION['is_login'],
-    'register_success'=>$_SESSION['register_success'], 'email'=>$_SESSION['email'],
-    'f_name'=>$_SESSION['first_name'], 'l_name'=>$_SESSION['last_name'],
-    'is_register'=>$_SESSION['is_register']));
 
 
+echo $twig->render('index.twig',
+    array('email_not_exist' => $session->get('email_not_exist'), 'wrong_pw' => $session->get('wrong_pw'),
+        'email_exist' => $session->get('email_exist'), 'reg_fail' => $session->get('reg_fail'),
+        'reg_success' => $session->get('reg_success'), 'email' => $session->get('email'),
+        'f_name' => $session->get('first_name'), 'l_name' => $session->get('last_name')
+    )
+);
