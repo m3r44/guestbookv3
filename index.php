@@ -3,11 +3,11 @@ error_reporting(E_ALL^E_NOTICE);
 
 use utility\Session;
 include "Session.php";
-include "SQL_Controller.php";
+include "SQL_post.php";
 include "GetUser.php";
 $session = new Session();
-$sqlController = new SQL_Controller();
 $userInfo = new getUser();
+$sqlPost = new SQL_post($userInfo, $session);
 
 require_once __DIR__ . '/vendor/autoload.php';
 $loader = new Twig_Loader_Filesystem(__DIR__);
@@ -29,11 +29,11 @@ else{
     }
 }
 
-
 echo $twig->render('index.twig',
     array('email_not_exist' => $session->get('email_not_exist'), 'wrong_pw' => $session->get('wrong_pw'),
         'email_exist' => $session->get('email_exist'), 'reg_fail' => $session->get('reg_fail'),
         'reg_success' => $session->get('reg_success'), 'email' => $session->get('email'),
-        'f_name' => $session->get('first_name'), 'l_name' => $session->get('last_name')
+        'f_name' => $session->get('first_name'), 'l_name' => $session->get('last_name'),
+        'email_invalid' => $session->get('email_invalid')
     )
 );

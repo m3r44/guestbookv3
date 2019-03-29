@@ -34,7 +34,7 @@
         <div class="alert alert-success" role="alert">
             {{ session.add_file }}
         </div>
-    {% elseif session.edit_fail is defined %}
+    {% elseif session.add_fail is defined %}
         <div class="alert alert-danger" role="alert">
             {{ session.add_fail }}
         </div>
@@ -42,21 +42,25 @@
         <div class="alert alert-danger" role="alert">
             {{ session.edit_fail }}
         </div>
-    {% elseif session.edit_fail is defined %}
+    {% elseif session.delete_fail is defined %}
         <div class="alert alert-danger" role="alert">
             {{ session.delete_fail }}
         </div>
-    {% elseif session.edit_fail is defined %}
+    {% elseif session.add_file_fail is defined %}
         <div class="alert alert-danger" role="alert">
             {{ session.add_file_fail }}
         </div>
-    {% elseif session.edit_fail is defined %}
+    {% elseif session.add_fail_info is defined %}
         <div class="alert alert-danger" role="alert">
             {{ session.add_fail_info }}
         </div>
-    {% elseif session.edit_fail is defined %}
+    {% elseif session.add_file_fail_ext is defined %}
         <div class="alert alert-danger" role="alert">
             {{ session.add_file_fail_ext }}
+        </div>
+    {% elseif session.email_invalid is defined %}
+        <div class="alert alert-danger" role="alert">
+            {{ session.email_invalid }}
         </div>
     {% endif %}
 
@@ -216,5 +220,5 @@
 </body>
 
 <footer>
-    Total posts: {{ num_rows }} <br>
+    Total posts: {{ num_rows }} <br />
 </footer>

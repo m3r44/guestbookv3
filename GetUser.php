@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nurmahirah
- * Date: 27/3/2019
- * Time: 2:03 PM
- */
 
 class GetUser
 {
